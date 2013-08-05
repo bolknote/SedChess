@@ -361,7 +361,7 @@ Enter command:
     }
 
     #оценочная функция для позиции чёрного коня
-    /@estimate-black-king! */ {
+    /@estimate-black-knight! */ {
         s///; h; s/.*Board://; s/ .*$//
 
         # выделяем коней
