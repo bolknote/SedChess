@@ -4,7 +4,7 @@
     figures!\
     board!\
     repeat?\
-    estimate-black-pieces!\
+    estimate-black-pawn!\
     log!\
     del!\
     input!\
@@ -14,6 +14,7 @@
     repeat-end!\
 /
 
+    # estimate-black-pieces!\
     # estimate-black-queen!\
     # estimate-black-pawn!\
     # estimate-black-king!\
@@ -314,10 +315,8 @@ Enter command:
         # нужно их сложить
         s/$/ :::S/
 
-        # FIXME!!!!         # СУММА НЕ РАБОТАЕТ С ПРОПУСКАМИ РАЗРЯДОВ!!
-
         :estimate-black-pawn::shift
-        /11*B/ {
+        /[1:][1:]*B/ {
             # сложение разряда
             :estimate-black-pawn::sum
             /11*B/ {
@@ -334,7 +333,7 @@ Enter command:
         }
 
         s/:\(1*\)S/S \1:/
-
+        
         # нормализация числа: сотни:десятки:единицы
         # на этом этапе неоткуда появиться тысячам — максимальная сумма 388
         s/[^:1]//g; s/:$//; s/^/Bin:/
@@ -399,7 +398,7 @@ Enter command:
 
         # складываем веса
         :estimate-black-knight::shift
-        /11*B/ {
+        /[1:][1:]*B/  {
             :estimate-black-knight::sum
             /11*B/ {
                 s/\(11*\)B\(.*\)\(1*\)S/B\2\1\3S/; s/:1111111111\(1*\)S/1:\1S/
@@ -430,7 +429,7 @@ Enter command:
 
         # складываем веса
         :estimate-black-bishop::shift
-        /11*B/ {
+        /[1:][1:]*B/  {
             :estimate-black-bishop::sum
             /11*B/ {
                 s/\(11*\)B\(.*\)\(1*\)S/B\2\1\3S/; s/:1111111111\(1*\)S/1:\1S/
