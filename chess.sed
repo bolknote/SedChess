@@ -4,7 +4,7 @@
     figures!\
     board!\
     repeat?\
-    estimate-black-queen!\
+    estimate-black-pieces!\
     log!\
     del!\
     input!\
@@ -13,6 +13,13 @@
     count-pieces!\
     repeat-end!\
 /
+
+    # estimate-black-queen!\
+    # estimate-black-pawn!\
+    # estimate-black-king!\
+    # estimate-black-bishop!\
+    # estimate-black-queen!\
+
 # переформатирование команд
 1s/ *//g; 1s/\n/ /g; 1s/^ //
 
@@ -208,9 +215,13 @@ Enter command:
         # убираем всё, кроме подсчитываемых фигур
         s/[^PINRQ]//g
         # считаем количество * коэффициент фигуры (ферзь Q — единственный)
-        s/P/1::/g; s/[IN]/111::/g; s/R/11111::/g; s/Q/111111111::/; s/^/Bin:/
+        s/P/1/g; s/[IN]/111/g; s/R/11111/g; s/Q/111111111/
+
+        # группируем сотни и тысячи
+        s/1111111111/H/g; s/HHHHHHHHHHH/T/g; s/\(.\)\1*/&:/g; s/[ :]*$/::/; y/HT/11/
+
         # добавляем к сохранённому стеку
-        G; s/\n/ /
+        s/^/Bin:/; G; s/\n/ /
 
         b @
     }
@@ -302,6 +313,8 @@ Enter command:
         # теперь у нас есть позиционные оценки свободных чёрных пешек и оценки всех чёрных пешек
         # нужно их сложить
         s/$/ :::S/
+
+        # FIXME!!!!         # СУММА НЕ РАБОТАЕТ С ПРОПУСКАМИ РАЗРЯДОВ!!
 
         :estimate-black-pawn::shift
         /11*B/ {
