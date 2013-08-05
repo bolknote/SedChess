@@ -6,12 +6,14 @@
         board()\
         input()\
         step()\
+        set-array()\
         estimate-black-pieces()\
         estimate-black-queen()\
         estimate-black-pawn()\
         estimate-black-king()\
         estimate-black-bishop()\
         estimate-black-queen()\
+        sum-array()\
         log()\
     }\
 /
@@ -42,6 +44,12 @@
 
 :@
 s/@\([^ ]* \)/\1@/
+
+# положить на стек
+/@set-array()/ {
+    s/^/ARRAY /
+    b @
+}
 
 # метка
 /@{/ {
@@ -170,7 +178,7 @@ Enter command:
     # убираем всё, кроме белых фигур
     s/[^pqkbnrPQKINR]//g
     # считаем
-    s/./1/g; s/^/Bin:/
+    s/./1/g
     # возвращаем стек команд
     G
     # после G появился перевод строки, убираем его
@@ -194,7 +202,7 @@ Enter command:
     s/1111111111/H/g; s/HHHHHHHHHHH/T/g; s/\(.\)\1*/&:/g; s/[ :]*$/::/; y/HT/11/
 
     # добавляем к сохранённому стеку
-    s/^/Bin:/; G; s/\n/ /
+    G; s/\n/B /
 
     b @
 }
@@ -281,34 +289,6 @@ Enter command:
     # возвращаем сохранённые оценки, убираем остатки стека
     G; s/\n\(.*\)\n.*/ \1/
 
-    # → Этап 6
-    # теперь у нас есть позиционные оценки свободных чёрных пешек и оценки всех чёрных пешек
-    # нужно их сложить
-    s/$/ :::S/
-
-    :estimate-black-pawn::shift
-    /[1:][1:]*B/ {
-        # сложение разряда
-        :estimate-black-pawn::sum
-        /11*B/ {
-            s/\(11*\)B\(.*\)\(1*\)S/B\2\1\3S/
-            s/:1111111111\(1*\)S/1:\1S/
-
-            b estimate-black-pawn::sum
-        }
-
-        # сдвиг разряда
-        s/:B/B/g; s/:\(1*\)S/S \1:/
-
-        b estimate-black-pawn::shift
-    }
-
-    s/:\(1*\)S/S \1:/
-
-    # нормализация числа: сотни:десятки:единицы
-    # на этом этапе неоткуда появиться тысячам — максимальная сумма 388
-    s/[^:1]//g; s/:$//; s/^/Bin:/
-
     # добавляем к сохранённому стеку, вычищаем наш мусор, который мы складывали выше —
     # там второй строкой лежат оценки
     G; s/\n.*\n/ /
@@ -338,7 +318,7 @@ Enter command:
 
     s/[a-h][1-9]./::111111/
 
-    s/^/Bin:/; G; s/\n/ /
+    G; s/\n/B /
 
     b @
 }
@@ -367,22 +347,6 @@ Enter command:
 
     s/[a-h][1-9]./::1111B/g
 
-    # складываем веса
-    s/$/ :::S/
-
-    :estimate-black-knight::shift
-    /[1:][1:]*B/  {
-        :estimate-black-knight::sum
-        /11*B/ {
-            s/\(11*\)B\(.*\)\(1*\)S/B\2\1\3S/; s/:1111111111\(1*\)S/1:\1S/
-            b estimate-black-knight::sum
-        }
-        s/:B/B/g; s/:\(1*\)S/S \1:/
-        b estimate-black-knight::shift
-    }
-
-    s/:\(1*\)S/S \1:/; s/[^:1]//g; s/:$//; s/^/Bin:/
-
     G; s/\n/ /
 
     b @
@@ -401,21 +365,6 @@ Enter command:
     s/[bg][72]./:11:11B/g; s/[c-f][3-6]/:11:11B/g
 
     s/[a-h][1-9]./:1:11111111B/g
-
-    # складываем веса
-    s/$/ :::S/
-
-    :estimate-black-bishop::shift
-    /[1:][1:]*B/  {
-        :estimate-black-bishop::sum
-        /11*B/ {
-            s/\(11*\)B\(.*\)\(1*\)S/B\2\1\3S/; s/:1111111111\(1*\)S/1:\1S/
-            b estimate-black-bishop::sum
-        }
-        s/:B/B/g; s/:\(1*\)S/S \1:/
-        b estimate-black-bishop::shift
-    }
-    s/:\(1*\)S/S \1:/; s/[^:1]//g; s/:$//; s/^/Bin:/
 
     G; s/\n/ /
 
@@ -468,8 +417,38 @@ Enter command:
     # меньше 300
     s/1111111111/D/g; s/DDDDDDDDDD/H/g; s/\(.\)\1*/&:/g; s/[ :]*$//; y/HD/11/
 
-    s/^/Bin:/; G; s/\n/ /
+    G; s/\n/B /
 
+    b @
+}
+
+/@sum-array()/ {
+    h
+    /ARRAY.*/ {
+        s///
+
+        s/$/ ::::S/
+
+        :sum-array::shift
+        /[1:][1:]*B/ {
+            # сложение разряда
+            :sum-array::sum
+            /11*B/ {
+                s/\(11*\)B\(.*\)\(1*\)S/B\2\1\3S/
+                s/:1111111111\(1*\)S/1:\1S/
+
+                b sum-array::sum
+            }
+
+            # сдвиг разряда
+            s/:B/B/g; s/:\(1*\)S/S \1:/
+
+            b sum-array::shift
+        }
+
+        s/:\(1*\)S/S \1:/; s/[^1:]//g
+        G; s/:*\n.*ARRAY/B /
+    }
     b @
 }
 
