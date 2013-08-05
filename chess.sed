@@ -1,23 +1,12 @@
 #n
 1s/.*/\
-    Bin:1\
+    @\
     figures!\
-    board!\
-    repeat?\
-    estimate-black-pieces!\
-    estimate-black-queen!\
-    estimate-black-pawn!\
-    estimate-black-king!\
-    estimate-black-bishop!\
-    estimate-black-queen!\
-    estimate-black-knight!\
-    log!\
-    del!\
-    input!\
-    step!\
-    board!\
-    count-pieces!\
-    repeat-end!\
+    {\
+        board!\
+        input!\
+        step!\
+    }\
 /
 
     # estimate-black-pieces!\
@@ -53,48 +42,31 @@
 
 :@
 
-/[a-z][a-z-]*[!?]/ {
-    s//@&/
+/@/ {
+    s/@\([^ ]* \)/\1@/
 
-    # убрать верхнее значение
-    /@del! */ {
-        s///
-        s/^[^ ]* *//
+    # метка
+    /@{/ {
         b @
     }
 
-    # повтор, пока на вершине не пустое
-    /@repeat\? */ {
-        /Bin:1* */ {
-            s///
-            s/@repeat\? \(.*\)repeat-end!/\1repeat\? \1repeat-end!/
-
-            b @
-        }
-        s/Bin:[^ ]* *//
-
-        b @
-    }
-
-    # дублирование первого значения
-    /@dup! */ {
-        s///
-        s/[^ ]*/& &/
-
+    # переход к метке
+    /@}/ {
+        s/{\([^}]*\)@}/@{\1}/
         b @
     }
 
     # ввод данных
-    /@input! */ {
-        s///; h; b
+    /@input!/ {
+        h; b
     }
 
     # генерация начального состояния доски
-    /@figures! */ {
+    /@figures!/ {
         # формат: XYFig
         # координаты белых тут и дальше должны идти НИЖЕ чёрных
         # БОЛЬШИЕ — чёрные, маленькие — белые
-        s//Board:\
+        s/^/Board:\
 a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
 a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
 a6 b6 c6 d6 e6 f6 g6 h6 \
@@ -111,8 +83,7 @@ a1rb1nc1id1qe1kf1ig1nh1r /
     }
 
     # вывод доски
-    /@board! */ {
-        s///
+    /@board!/ {
         # сохраняем стек команд
         h
         # убираем всё, кроме доски
@@ -153,9 +124,7 @@ Enter command:
     }
 
     # делаем ход по введённым пользователем данным
-    /@step! */ {
-        s///
-
+    /@step!/ {
         # гарды основных регулярок (их нужно тщательно защищать от несрабатываний,
         # иначе sed выдаст ошибку и остановится)
         # вычищаем всё, кроме доски и первых двух значений
@@ -195,8 +164,7 @@ Enter command:
     }
 
     # количество оставшихся фигур
-    /@count-pieces! */ {
-        s///
+    /@count-pieces!/ {
         h
         # убираем всё, кроме доски
         s/.*Board://
@@ -214,11 +182,11 @@ Enter command:
     }
 
     #оценочная функция имеющихся чёрных фигур
-    /@estimate-black-pieces! */ {
+    /@estimate-black-pieces!/ {
         # пешка — 100, слон и конь — 300, ладья — 500, ферзь — 900
 
         # очистка всего лишнего
-        s///; h; s/.*Board://; s/ .*$//
+        h; s/.*Board://; s/ .*$//
         # убираем всё, кроме подсчитываемых фигур
         s/[^PINRQ]//g
         # считаем количество * коэффициент фигуры (ферзь Q — единственный)
@@ -234,16 +202,15 @@ Enter command:
     }
 
     #для отладки: вывод текущего стека
-    /@log! */ {
-        s///
+    /@log!/ {
         l
         b @
     }
 
     #оценочная функция для позиции чёрных пешек
-    /@estimate-black-pawn! */ {
+    /@estimate-black-pawn!/ {
         # очистка всего лишнего
-        s///; h; s/.*Board://; s/ .*$//
+        h; s/.*Board://; s/ .*$//
         # оставляем только чёрные и белые пешки, перекодируем их в понятные координаты
         # теперь пешки записаны вот так: XЦвет (где Цвет — Black или White), разделены пробелом
         s/[a-h][1-8][^Pp]//g; y/Ppabcdefgh/WB12345678/; s/\([1-8]\)[1-8]/ \1/g
@@ -352,8 +319,8 @@ Enter command:
     }
 
     #оценочная функция для позиции чёрного короля
-    /@estimate-black-king! */ {
-        s///; h; s/.*Board://; s/ .*$//
+    /@estimate-black-king!/ {
+        h; s/.*Board://; s/ .*$//
 
         # выделяем короля
         s/[a-h][1-8][^k]//g
@@ -379,8 +346,8 @@ Enter command:
     }
 
     #оценочная функция для позиции чёрного коня
-    /@estimate-black-knight! */ {
-        s///; h; s/.*Board://; s/ .*$//
+    /@estimate-black-knight!/ {
+        h; s/.*Board://; s/ .*$//
 
         # выделяем коней
         s/[a-h][1-8][^n]//g
@@ -415,7 +382,7 @@ Enter command:
             s/:B/B/g; s/:\(1*\)S/S \1:/
             b estimate-black-knight::shift
         }
-        
+
         s/:\(1*\)S/S \1:/; s/[^:1]//g; s/:$//; s/^/Bin:/
 
         G; s/\n/ /
@@ -424,8 +391,8 @@ Enter command:
     }
 
     #оценочная функция для позиции чёрного слона
-    /@estimate-black-bishop! */ {
-        s///; h; s/.*Board://; s/ .*$//
+    /@estimate-black-bishop!/ {
+        h; s/.*Board://; s/ .*$//
 
         # выделяем слонов
         s/[a-h][1-8][^i]//g
@@ -458,8 +425,8 @@ Enter command:
     }
 
     #оценочная функция для позиции чёрной королевы (ферзя)
-    /@estimate-black-queen! */ {
-        s///; h; s/.*Board://; s/ .*$//
+    /@estimate-black-queen!/ {
+        h; s/.*Board://; s/ .*$//
 
         # выделяем ферзя и вражеского короля
         s/[a-h][1-8][^qK]//g
@@ -507,6 +474,12 @@ Enter command:
 
         b @
     }
+
+    /@ *$/ {
+        q
+    }
+
+    b @
 }
 
 b @
