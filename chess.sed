@@ -4,7 +4,13 @@
     figures!\
     board!\
     repeat?\
+    estimate-black-pieces!\
+    estimate-black-queen!\
     estimate-black-pawn!\
+    estimate-black-king!\
+    estimate-black-bishop!\
+    estimate-black-queen!\
+    estimate-black-knight!\
     log!\
     del!\
     input!\
@@ -333,7 +339,7 @@ Enter command:
         }
 
         s/:\(1*\)S/S \1:/
-        
+
         # нормализация числа: сотни:десятки:единицы
         # на этом этапе неоткуда появиться тысячам — максимальная сумма 388
         s/[^:1]//g; s/:$//; s/^/Bin:/
@@ -394,9 +400,11 @@ Enter command:
 
         s/[bg][72]./::11111111B/g; s/[ah][63]./::11111111B/g; s/[cf][81]./::11111111B/g
 
-        s/[a-h][1-9]./::1111B/
+        s/[a-h][1-9]./::1111B/g
 
         # складываем веса
+        s/$/ :::S/
+
         :estimate-black-knight::shift
         /[1:][1:]*B/  {
             :estimate-black-knight::sum
@@ -407,8 +415,10 @@ Enter command:
             s/:B/B/g; s/:\(1*\)S/S \1:/
             b estimate-black-knight::shift
         }
+        
+        s/:\(1*\)S/S \1:/; s/[^:1]//g; s/:$//; s/^/Bin:/
 
-        s/^/Bin:/; G; s/\n/ /
+        G; s/\n/ /
 
         b @
     }
@@ -428,6 +438,8 @@ Enter command:
         s/[a-h][1-9]./:1:11111111B/g
 
         # складываем веса
+        s/$/ :::S/
+
         :estimate-black-bishop::shift
         /[1:][1:]*B/  {
             :estimate-black-bishop::sum
@@ -438,8 +450,9 @@ Enter command:
             s/:B/B/g; s/:\(1*\)S/S \1:/
             b estimate-black-bishop::shift
         }
+        s/:\(1*\)S/S \1:/; s/[^:1]//g; s/:$//; s/^/Bin:/
 
-        s/^/Bin:/; G; s/\n/ /
+        G; s/\n/ /
 
         b @
     }
