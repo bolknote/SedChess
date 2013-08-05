@@ -1,20 +1,20 @@
 #n
 1s/.*/\
     @\
-    figures!\
+    figures()\
     {\
-        board!\
-        input!\
-        step!\
+        board()\
+        input()\
+        step()\
+        estimate-black-pieces()\
+        estimate-black-queen()\
+        estimate-black-pawn()\
+        estimate-black-king()\
+        estimate-black-bishop()\
+        estimate-black-queen()\
+        log()\
     }\
 /
-
-    # estimate-black-pieces!\
-    # estimate-black-queen!\
-    # estimate-black-pawn!\
-    # estimate-black-king!\
-    # estimate-black-bishop!\
-    # estimate-black-queen!\
 
 # переформатирование команд
 1s/ *//g; 1s/\n/ /g; 1s/^ //
@@ -55,12 +55,12 @@ s/@\([^ ]* \)/\1@/
 }
 
 # ввод данных
-/@input!/ {
+/@input()/ {
     h; b
 }
 
 # генерация начального состояния доски
-/@figures!/ {
+/@figures()/ {
     # формат: XYFig
     # координаты белых тут и дальше должны идти НИЖЕ чёрных
     # БОЛЬШИЕ — чёрные, маленькие — белые
@@ -81,7 +81,7 @@ a1rb1nc1id1qe1kf1ig1nh1r /
 }
 
 # вывод доски
-/@board!/ {
+/@board()/ {
     # сохраняем стек команд
     h
     # убираем всё, кроме доски
@@ -122,7 +122,7 @@ Enter command:
 }
 
 # делаем ход по введённым пользователем данным
-/@step!/ {
+/@step()/ {
     # гарды основных регулярок (их нужно тщательно защищать от несрабатываний,
     # иначе sed выдаст ошибку и остановится)
     # вычищаем всё, кроме доски и первых двух значений
@@ -162,7 +162,7 @@ Enter command:
 }
 
 # количество оставшихся фигур
-/@count-pieces!/ {
+/@count-pieces()/ {
     h
     # убираем всё, кроме доски
     s/.*Board://
@@ -180,7 +180,7 @@ Enter command:
 }
 
 #оценочная функция имеющихся чёрных фигур
-/@estimate-black-pieces!/ {
+/@estimate-black-pieces()/ {
     # пешка — 100, слон и конь — 300, ладья — 500, ферзь — 900
 
     # очистка всего лишнего
@@ -200,13 +200,13 @@ Enter command:
 }
 
 #для отладки: вывод текущего стека
-/@log!/ {
+/@log()/ {
     l
-    b @
+    q
 }
 
 #оценочная функция для позиции чёрных пешек
-/@estimate-black-pawn!/ {
+/@estimate-black-pawn()/ {
     # очистка всего лишнего
     h; s/.*Board://; s/ .*$//
     # оставляем только чёрные и белые пешки, перекодируем их в понятные координаты
@@ -317,7 +317,7 @@ Enter command:
 }
 
 #оценочная функция для позиции чёрного короля
-/@estimate-black-king!/ {
+/@estimate-black-king()/ {
     h; s/.*Board://; s/ .*$//
 
     # выделяем короля
@@ -344,7 +344,7 @@ Enter command:
 }
 
 #оценочная функция для позиции чёрного коня
-/@estimate-black-knight!/ {
+/@estimate-black-knight()/ {
     h; s/.*Board://; s/ .*$//
 
     # выделяем коней
@@ -389,7 +389,7 @@ Enter command:
 }
 
 #оценочная функция для позиции чёрного слона
-/@estimate-black-bishop!/ {
+/@estimate-black-bishop()/ {
     h; s/.*Board://; s/ .*$//
 
     # выделяем слонов
@@ -423,7 +423,7 @@ Enter command:
 }
 
 #оценочная функция для позиции чёрной королевы (ферзя)
-/@estimate-black-queen!/ {
+/@estimate-black-queen()/ {
     h; s/.*Board://; s/ .*$//
 
     # выделяем ферзя и вражеского короля
