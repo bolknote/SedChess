@@ -2,22 +2,31 @@
 1s/.*/\
     @\
     figures()\
-    {\
+    label(cycle)\
         board()\
         input()\
         step()\
-        set-array()\
-        estimate-black-pieces()\
-        estimate-black-queen()\
-        estimate-black-pawn()\
-        estimate-black-king()\
-        estimate-black-bishop()\
-        estimate-black-queen()\
-        sum-array()\
-        select-figures(p)\
-        log()\
-    }\
+        select-figures(n)\
+        label(knight)\
+            copy-board()\
+            set-array()\
+            estimate-black-pieces()\
+            estimate-black-knight()\
+            sum-array()\
+            delete-board()\
+            log()\
+        back(knight)\
+    back(cycle)\
 /
+
+# estimate-black-pieces()\
+# estimate-black-queen()\
+# estimate-black-knight()\
+# estimate-black-pawn()\
+# estimate-black-king()\
+# estimate-black-bishop()\
+# estimate-black-queen()\
+
 
 # оценки запрограммированы по матрицам из книги
 # «Программирование шахмат и других логических игр» Корнилова Евгения Николаевича
@@ -49,26 +58,38 @@
 :@
 s/@\([^ ]* \)/\1@/
 
-# положить на стек
+# начать массив
 /@set-array()/ {
     s/^/ARRAY /
     b @
 }
 
 # метка
-/@{/ {
+/@label(/ {
     b @
 }
 
 # переход к метке
-/@}/ {
-    s/{\([^}]*\)@}/@{\1}/
+/@back(/ {
+    s/label(\([^)]*\))\(.*\)@back(\1)/@label(\1)\2back(\1)/
     b @
 }
 
 # ввод данных
 /@input()/ {
     h; b
+}
+
+# удаление первой доски
+/@delete-board()/ {
+    s/Board:[^ ]* *//
+    b @
+}
+
+# дублирование доски
+/@copy-board()/ {
+    s/\(Board:[^ ]*\)/\1 \1/
+    b @
 }
 
 # генерация начального состояния доски
@@ -457,6 +478,8 @@ Enter command:
     b @
 }
 
+# выбор указанной фигуры (вернётся в виде строки)
+# __XY__XY… где __ — место для номера хода этой фигуры
 /@select-figures(.)/ {
     h
     # убираем из данных всё лишнее, параметр помечаем маркером
@@ -478,6 +501,17 @@ Enter command:
     G; s/\n/ /
     b @
 }
+
+# просчёт ходов пешки. На стеке должны быть: начальная оценка по пешкам
+# (сюда будет складываться максимум) и выписаны все пешки
+# чёрные пешки умеют ходить по 4м направлениям:
+# 1) на 1 ход (D1)
+# 2) на 2 до середины доски, если поле перед ней не занято (D2)
+# 3) вниз влево, если там чужая фигура (DL)
+# 4) вниз вправо, если там чужая фигура (DR)
+# кроме того, пешка, достигая края доски, имеет право превратиться в любую фигуру (кроме короля)
+
+
 
 /@ *$/ {
     q
