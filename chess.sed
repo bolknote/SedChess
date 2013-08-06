@@ -14,6 +14,8 @@
         estimate-black-bishop()\
         estimate-black-queen()\
         sum-array()\
+        set-array()\
+        select-figures(p)\
         log()\
     }\
 /
@@ -422,6 +424,7 @@ Enter command:
     b @
 }
 
+# суммированние чисел на стеке, пока не встретится слово ARRAY
 /@sum-array()/ {
     h
     /ARRAY.*/ {
@@ -449,6 +452,28 @@ Enter command:
         s/:\(1*\)S/S \1:/; s/[^1:]//g
         G; s/:*\n.*ARRAY/B /
     }
+    b @
+}
+
+/@select-figures(.)/ {
+    h
+    # убираем из данных всё лишнее
+    s/@select-figures(\(.\))\(.*\)/\2 Selected:\1/
+    s/.*Board://
+    s/ .*Selected:/ Selected:/
+
+    # выделяем из доски то, что указал пользователь
+    :select-figures::select
+    /\([a-h][0-9]\)\(.\)\(.* Selected:\2\)/ {
+        s//\3 \1\2/
+        b select-figures::select
+    }
+
+    # убираем маркер и изувеченную доску
+    s/.*Selected:. //
+
+    # возвращаем стек
+    G; s/\n/ /
     b @
 }
 
