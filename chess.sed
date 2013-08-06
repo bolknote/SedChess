@@ -14,11 +14,13 @@
         estimate-black-bishop()\
         estimate-black-queen()\
         sum-array()\
-        set-array()\
         select-figures(p)\
         log()\
     }\
 /
+
+# оценки запрограммированы по матрицам из книги
+# «Программирование шахмат и других логических игр» Корнилова Евгения Николаевича
 
 # переформатирование команд
 1s/ *//g; 1s/\n/ /g; 1s/^ //
@@ -457,7 +459,7 @@ Enter command:
 
 /@select-figures(.)/ {
     h
-    # убираем из данных всё лишнее
+    # убираем из данных всё лишнее, параметр помечаем маркером
     s/@select-figures(\(.\))\(.*\)/\2 Selected:\1/
     s/.*Board://
     s/ .*Selected:/ Selected:/
@@ -465,12 +467,12 @@ Enter command:
     # выделяем из доски то, что указал пользователь
     :select-figures::select
     /\([a-h][0-9]\)\(.\)\(.* Selected:\2\)/ {
-        s//\3 \1\2/
+        s//\3__\1/
         b select-figures::select
     }
 
     # убираем маркер и изувеченную доску
-    s/.*Selected:. //
+    s/.*Selected:.//
 
     # возвращаем стек
     G; s/\n/ /
