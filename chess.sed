@@ -20,6 +20,11 @@
             delete-last-board()\
             store-iter()\
         back(knight)\
+        select-figures(K)\
+        label(king)\
+            iter-king()\
+            break-if-end(king)\
+        back(king)\
         find-best-move()\
         move-black()\
         board()\
@@ -727,6 +732,21 @@ Enter command:
     s/\(Board:[^ ]*\)\(.*\)\(Board:[^ ]*\)/\3\2\1/
 
     b @
+}
+
+# король ходит на одну клетку куда угодно              N
+# кодировка по сторонам света                        W   E
+# __ → NN → NE → EE → ES → SS → SW → WW → WN → XX      S
+/@iter-king()/ {
+    # убираем короля, который ход закончил
+    s/^...XX//
+    # выходим, если ходить нечем
+    /^END/ b @
+
+    # выделяем первого (и единственного) короля
+    h; s/\(.....\).*/\1/
+
+    l;q
 }
 
 # перемещаем позицию и сумму в конец стека,
