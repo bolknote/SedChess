@@ -16,6 +16,7 @@
             estimate-black-pieces()\
             estimate-black-knight()\
             sum-array()\
+            l()\
             sub-array()\
             delete-last-board()\
             store-iter()\
@@ -279,6 +280,13 @@ Enter command:
     q
 }
 
+/@l()/ {
+    h
+    l
+    w chess.log
+    g
+}
+
 #оценочная функция для позиции чёрных пешек
 /@estimate-black-pawn()/ {
     # очистка всего лишнего
@@ -513,7 +521,8 @@ Enter command:
         }
 
         s/:\(1*\)S/S \1:/; s/[^1:]//g
-        G; s/ARRAY/1#&/; s/:*\n.*1#ARRAY */B /
+
+        G; s/ARRAY/#&/; s/\n.*#ARRAY */B /
     }
     b @
 }
@@ -575,7 +584,7 @@ Enter command:
         s/[MS ]//g; s/://
 
         :sub-array::end
-        G; s/ARRAY/1#&/; s/:*\n.*1#ARRAY */B /
+        G; s/ARRAY/#&/; s/:*\n.*#ARRAY */B /
     }
 
     b @
@@ -691,7 +700,7 @@ Enter command:
     }
 
     :iter-knight::go
-    
+
     # возвращаем стек
     G; s/\n//
     # переписываем куда мы уже ходили в текущую фигуру
