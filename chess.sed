@@ -1,97 +1,146 @@
 #n
-# FIXME: на время вычисления шаха нужно убирать короля с доски (заменять фигуру на что-то), чтобы текущее его состояние не
-# закрывало ход фигурам
+# 1s/.*/\
+#     @\
+#     figures()\
+#     board()\
+#     label(loop)\
+#         input()\
+#         move-white()\
+#         select-figures(P)\
+#         label(pawn)\
+#             iter-pawn()\
+#             break-if-end(pawn)\
+#             set-array()\
+#             estimate-white-pieces()\
+#             set-array()\
+#             estimate-black-pieces()\
+#             estimate-black-pawn()\
+#             sum-array()\
+#             sub-array()\
+#             delete-last-board()\
+#             store-iter()\
+#         back(pawn)\
+#         select-figures(Q)\
+#         label(queen)\
+#             iter-queen()\
+#             break-if-end(queen)\
+#             set-array()\
+#             estimate-white-pieces()\
+#             set-array()\
+#             estimate-black-pieces()\
+#             estimate-black-queen()\
+#             sum-array()\
+#             sub-array()\
+#             delete-last-board()\
+#             store-iter()\
+#         back(queen)\
+#         select-figures(I)\
+#         label(bishop)\
+#             iter-bishop()\
+#             break-if-end(bishop)\
+#             set-array()\
+#             estimate-white-pieces()\
+#             set-array()\
+#             estimate-black-pieces()\
+#             estimate-black-bishop()\
+#             sum-array()\
+#             sub-array()\
+#             delete-last-board()\
+#             store-iter()\
+#         back(bishop)\
+#         select-figures(N)\
+#         label(knight)\
+#             iter-knight()\
+#             break-if-end(knight)\
+#             set-array()\
+#             estimate-white-pieces()\
+#             set-array()\
+#             estimate-black-pieces()\
+#             estimate-black-knight()\
+#             sum-array()\
+#             sub-array()\
+#             delete-last-board()\
+#             store-iter()\
+#         back(knight)\
+#         select-figures(K)\
+#         label(king)\
+#             iter-king()\
+#             break-if-end(king)\
+#             set-array()\
+#             estimate-white-pieces()\
+#             set-array()\
+#             estimate-black-pieces()\
+#             estimate-black-king()\
+#             sum-array()\
+#             sub-array()\
+#             delete-last-board()\
+#             store-iter()\
+#         back(king)\
+#         select-figures(R)\
+#         label(rook)\
+#             iter-rook()\
+#             break-if-end(rook)\
+#             set-array()\
+#             estimate-white-pieces()\
+#             estimate-black-pieces()\
+#             sub-array()\
+#             delete-last-board()\
+#             store-iter()\
+#         back(rook)\
+#         find-best-move()\
+#         move-black()\
+#         select-figures(P)\
+#         label(pawnmoves)\
+#             iter-pawn()\
+#             break-if-end(pawnmoves)\
+#             delete-last-board()\
+#             store-only-iter()\
+#         back(pawnmoves)\
+#         select-figures(Q)\
+#         label(queenmoves)\
+#             iter-queen()\
+#             break-if-end(queenmoves)\
+#             delete-last-board()\
+#             store-only-iter()\
+#         back(queenmoves)\
+#         select-figures(K)\
+#         label(kingmoves)\
+#             iter-king()\
+#             break-if-end(kingmoves)\
+#             delete-last-board()\
+#             store-only-iter()\
+#         back(kingmoves)\
+#         select-figures(I)\
+#         label(bishopmoves)\
+#             iter-bishop()\
+#             break-if-end(bishopmoves)\
+#             delete-last-board()\
+#             store-only-iter()\
+#         back(bishopmoves)\
+#         select-figures(N)\
+#         label(knightmoves)\
+#             iter-knight()\
+#             break-if-end(knightmoves)\
+#             delete-last-board()\
+#             store-only-iter()\
+#         back(knightmoves)\
+#         select-figures(R)\
+#         label(rookmoves)\
+#             iter-rook()\
+#             break-if-end(rookmoves)\
+#             delete-last-board()\
+#             store-only-iter()\
+#         back(rookmoves)\
+#         board()\
+#         check-white-king()\
+#     back(loop)\
+# /
+
 1s/.*/\
     @\
     figures()\
     board()\
     label(loop)\
-        input()\
-        move-white()\
-        select-figures(P)\
-        label(pawn)\
-            iter-pawn()\
-            break-if-end(pawn)\
-            set-array()\
-            estimate-white-pieces()\
-            set-array()\
-            estimate-black-pieces()\
-            estimate-black-pawn()\
-            sum-array()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(pawn)\
-        select-figures(Q)\
-        label(queen)\
-            iter-queen()\
-            break-if-end(queen)\
-            set-array()\
-            estimate-white-pieces()\
-            set-array()\
-            estimate-black-pieces()\
-            estimate-black-queen()\
-            sum-array()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(queen)\
-        select-figures(I)\
-        label(bishop)\
-            iter-bishop()\
-            break-if-end(bishop)\
-            set-array()\
-            estimate-white-pieces()\
-            set-array()\
-            estimate-black-pieces()\
-            estimate-black-bishop()\
-            sum-array()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(bishop)\
-        select-figures(N)\
-        label(knight)\
-            iter-knight()\
-            break-if-end(knight)\
-            set-array()\
-            estimate-white-pieces()\
-            set-array()\
-            estimate-black-pieces()\
-            estimate-black-knight()\
-            sum-array()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(knight)\
-        select-figures(K)\
-        label(king)\
-            iter-king()\
-            break-if-end(king)\
-            set-array()\
-            estimate-white-pieces()\
-            set-array()\
-            estimate-black-pieces()\
-            estimate-black-king()\
-            sum-array()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(king)\
-        select-figures(R)\
-        label(rook)\
-            iter-rook()\
-            break-if-end(rook)\
-            set-array()\
-            estimate-white-pieces()\
-            estimate-black-pieces()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(rook)\
-        find-best-move()\
-        move-black()\
-        hide-white-king()\
         select-figures(P)\
         label(pawnmoves)\
             iter-pawn()\
@@ -99,6 +148,7 @@
             delete-last-board()\
             store-only-iter()\
         back(pawnmoves)\
+        log()\
         select-figures(Q)\
         label(queenmoves)\
             iter-queen()\
@@ -134,9 +184,9 @@
             delete-last-board()\
             store-only-iter()\
         back(rookmoves)\
-        restore-white-king()\
         board()\
         check-white-king()\
+        log()\
     back(loop)\
 /
 
@@ -235,9 +285,9 @@ a7 b7 c7 d7 e7 f7 g7 h7 \
 a6 b6 c6 d6 e6 f6 g6 h6 \
 a5 b5 c5 d5 e5 f5 g5 h5 \
 a4 b4 c4 d4 e4 f4 g4 h4 \
-a3 b3 c3 d3 e3Nf3 g3 h3 \
-a2Rb2 c2 d2 e2 f2 g2 h2 \
-a1 b1 c1 d1 e1kf1 g1 h1R /
+a3 b3 c3 d3 e3 f3 g3 h3 \
+a2Rb2 c2 d2 e2Pf2 g2 h2 \
+a1 b1 c1 d1 e1kf1 g1 h1  /
 
     s/\n//g
 
@@ -1035,7 +1085,7 @@ a1 b1 c1 d1 e1kf1 g1 h1R /
     /^\(.\)7P__/ {
         # собственно, сам ход
         s//\15PDT/
-        b common::go
+        b iter-pawn::checkpiece
     }
     # иначе, двигаемся по направлениям
     s/$/ __DODLDRXXDTDO/
@@ -1057,7 +1107,21 @@ a1 b1 c1 d1 e1kf1 g1 h1R /
 
         # убираем за собой доску
         s/ *Board:.*//
+
+        b common::go
     }
+
+    :iter-pawn::checkpiece
+    # пешка не может ходить прямо, если там стоит фигура
+    # возвращаем доску
+    G; s/\n.*\(Board:[^ ]*\).*/ \1/
+
+    # проверяем, есть ли там фигура, любая, если есть, ходить не можем
+    /^\(..\).*\1[pqkinrPQKINR]/ {
+        s/^../00/
+    }
+    # убираем за собой доску
+    s/ *Board:.*//
 
     b common::go
 }
@@ -1225,17 +1289,6 @@ a1 b1 c1 d1 e1kf1 g1 h1R /
     b @
 }
 
-# скрыть белого короля с поля (король заменяется на фейковую фигуру)
-/@hide-white-king()/ {
-    s/\(Board:[^ ]*\)k/\1z/
-}
-
-# вернуть белого короля с поля (король заменяется на фейковую фигуру)
-/@restore-white-king()/ {
-    s/\(Board:[^ ]*\)z/\1k/
-}
-
-
 # проверка белого короля на шах и мат
 /@check-white-king()/ {
     # копируем короля с координатой в конец
@@ -1312,7 +1365,7 @@ a1 b1 c1 d1 e1kf1 g1 h1R /
     }
 
     # вычищаем ходы короля
-    s/ *King:.*//
+    # s/ *King:.*//
 
     b @
 }
