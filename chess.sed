@@ -91,6 +91,7 @@
         back(rook)\
         find-best-move()\
         move-black()\
+        hide-white-king()\
         select-figures(P)\
         label(pawnmoves)\
             iter-pawn()\
@@ -133,6 +134,7 @@
             delete-last-board()\
             store-only-iter()\
         back(rookmoves)\
+        restore-white-king()\
         board()\
         check-white-king()\
     back(loop)\
@@ -1223,7 +1225,18 @@ a1 b1 c1 d1 e1kf1 g1 h1R /
     b @
 }
 
-# копирование белого короля на все ходы, какие возможны
+# скрыть белого короля с поля (король заменяется на фейковую фигуру)
+/@hide-white-king()/ {
+    s/\(Board:[^ ]*\)k/\1z/
+}
+
+# вернуть белого короля с поля (король заменяется на фейковую фигуру)
+/@restore-white-king()/ {
+    s/\(Board:[^ ]*\)z/\1k/
+}
+
+
+# проверка белого короля на шах и мат
 /@check-white-king()/ {
     # копируем короля с координатой в конец
     s/\(.*Board:[^ ]*\(..k\).*\)/\1 King:\2__/
