@@ -1,8 +1,4 @@
 #n
-# TODO: проверка на шах (угроза королю)
-# TODO: проверка на мат (никуда уйти нельзя)
-# TODO: преобразрвание дошедшей до края доски пешки (в ферзя!)
-# TODO: сдаться, если сходить некуда
 1s/.*/\
     @\
     figures()\
@@ -93,6 +89,50 @@
         back(rook)\
         find-best-move()\
         move-black()\
+        select-figures(P)\
+        label(pawnmoves)\
+            iter-pawn()\
+            break-if-end(pawnmoves)\
+            delete-last-board()\
+            store-only-iter()\
+        back(pawnmoves)\
+        select-figures(Q)\
+        label(queenmoves)\
+            iter-queen()\
+            break-if-end(queenmoves)\
+            delete-last-board()\
+            store-only-iter()\
+        back(queenmoves)\
+        select-figures(K)\
+        label(kingmoves)\
+            iter-king()\
+            break-if-end(kingmoves)\
+            delete-last-board()\
+            store-only-iter()\
+        back(kingmoves)\
+        select-figures(I)\
+        label(bishopmoves)\
+            iter-bishop()\
+            break-if-end(bishopmoves)\
+            delete-last-board()\
+            store-only-iter()\
+        back(bishopmoves)\
+        select-figures(N)\
+        label(knightmoves)\
+            iter-knight()\
+            break-if-end(knightmoves)\
+            delete-last-board()\
+            store-only-iter()\
+        back(knightmoves)\
+        select-figures(R)\
+        label(rookmoves)\
+            iter-rook()\
+            break-if-end(rookmoves)\
+            delete-last-board()\
+            store-only-iter()\
+        back(rookmoves)\
+        check-white-king()\
+        log()\
     back(loop)\
 /
 
@@ -184,6 +224,16 @@ a3 b3 c3 d3 e3 f3 g3 h3 \
 a2pb2pc2pd2pe2pf2pg2ph2p\
 a1rb1nc1id1qe1kf1ig1nh1r /
 # пробел в конце нужен!
+
+#     s/^/Board:\
+# a8 b8 c8 d8 e8Kf8 g8 h8 \
+# a7 b7 c7 d7 e7 f7 g7 h7 \
+# a6 b6 c6 d6 e6 f6 g6 h6 \
+# a5 b5 c5 d5 e5 f5 g5 h5 \
+# a4 b4 c4 d4 e4 f4 g4 h4 \
+# a3 b3 c3 d3 e3Nf3 g3 h3 \
+# a2Rb2 c2 d2 e2 f2 g2 h2 \
+# a1Rb1 c1 d1 e1kf1 g1 h1  /
 
     s/\n//g
 
@@ -1099,6 +1149,21 @@ Enter command:
     b @
 }
 
+# перемещаем позициюв конец стека (без веса фигуры)
+# перекладываем счётчик позиции фигуры
+/@store-only-iter()/ {
+    # если ходить было нельзя, вычищаем мусор
+    /^0..../ {
+        s///
+        b @
+    }
+
+    # (фигура хода) счётчик позиции (текущая фигура) всё остальное →
+    # текущая фигура, всё остальное, Move:ход куда
+    s/^\(...\)..\(...\)\([^ ]*END *.*\)/\2\3 Move:\1/
+    b @
+}
+
 # вычисление лучшего хода из указанных
 /@find-best-move()/ {
     # есть ли оценки (больше одной причём)?
@@ -1154,6 +1219,84 @@ Enter command:
     s/\([a-h]1\)P/\1Q/
 
     b @
+}
+
+# копирование белого короля на все ходы, какие возможны
+/@check-white-king()/ {
+    # копируем короля с координатой в конец
+    s/\(.*Board:[^ ]*\(..k\).*\)/\1 King:\2__/
+    h
+
+    :copy-white-king-moves::loop
+    /XX/ ! {
+        # убираем всё, кроме короля
+        s/.*King:\(.....\).*/\1/
+
+        # текущую выбранную позицию меняем на следующую (HR — ход на месте)
+        s/$/ __NNENEESESSWSWWNWHRXX/
+        s/\(..\) [^ ]*\1\(..\).*/\2/
+
+        # заменяем координты, согласно выбранной позиции
+
+        # Y+1
+        /N/ y/12345678/23456780/
+        # Y-1
+        /S/ y/12345678/01234567/
+        # X-1
+        /W/ y/abcdefgh/0abcdefg/
+        # X+1
+        /E/ y/abcdefgh/bcdefgh0/
+
+        H; g
+
+        # переписываем выбранную позицию в позицию самой первой фигуры (фигуры где король стоит сейчас)
+        s/\(King:...\)..\(.*..k\(..\)\)$/\1\3\2/
+
+        # проверяем найденную позицию, не упирается ли она в нашу же собственную фигуру
+        # первое условие проверяет не вышла ли позиция за доску
+        /.*\([^0][^0]\)k..$/ {
+            x
+            s//\1 &/
+            s/\(..\) \(.*Board:[^ ]*\1[pqinr].*\)..$/\1 \200/
+            # к этому моменту на стеке уже лежат ходы, которые могли бы сделать чёрные, если
+            # бы был их ход, в виде «Move:XYFig»
+            # надо проверить, не съели ли они короля на этом ходу
+            /\(..\) \(.*\) Move:\1./ {
+                s//\1 \2/
+                s/\(..\) \(.*King:.*\1k\)../\1 \20!/
+            }
+
+            # убираем координаты короля вверху стека, которые мы поставили для проверок
+            s/^.. //
+
+            x
+        }
+
+        b copy-white-king-moves::loop
+    }
+
+    # убираем переводы строк из списка королей
+    s/\n/ /g
+    # убираем ходы чёрных
+    s/ Move:...//g
+
+    # Анализ ситуации:
+    # 1. если король под ударом (нет XYkHR) — шах или мат
+    # 2. и нет ни одного хода без нуля — мат
+    /King:.*..kHR/ ! {
+        # шах или мат
+        i\
+        ШАХ ИЛИ МАТ
+
+        /King:.*[^0][^0]k[^0X][^0X]/ ! {
+            # мат
+
+            i\
+            МАТ
+        }
+    }
+
+    l;q
 }
 
 /@ *$/ {
