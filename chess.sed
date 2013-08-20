@@ -1,9 +1,11 @@
 #n
+# FIXME: на время вычисления шаха нужно убирать короля с доски (заменять фигуру на что-то), чтобы текущее его состояние не
+# закрывало ход фигурам
 1s/.*/\
     @\
     figures()\
+    board()\
     label(loop)\
-        board()\
         input()\
         move-white()\
         select-figures(P)\
@@ -131,8 +133,8 @@
             delete-last-board()\
             store-only-iter()\
         back(rookmoves)\
+        board()\
         check-white-king()\
-        log()\
     back(loop)\
 /
 
@@ -214,26 +216,26 @@ s/@\([^ ]* \)/\1@/
     # формат: XYFig
     # координаты белых тут и дальше должны идти НИЖЕ чёрных
     # БОЛЬШИЕ — чёрные, маленькие — белые
-    s/^/Board:\
-a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
-a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
-a6 b6 c6 d6 e6 f6 g6 h6 \
-a5 b5 c5 d5 e5 f5 g5 h5 \
-a4 b4 c4 d4 e4 f4 g4 h4 \
-a3 b3 c3 d3 e3 f3 g3 h3 \
-a2pb2pc2pd2pe2pf2pg2ph2p\
-a1rb1nc1id1qe1kf1ig1nh1r /
-# пробел в конце нужен!
-
 #     s/^/Board:\
-# a8 b8 c8 d8 e8Kf8 g8 h8 \
-# a7 b7 c7 d7 e7 f7 g7 h7 \
+# a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
+# a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
 # a6 b6 c6 d6 e6 f6 g6 h6 \
 # a5 b5 c5 d5 e5 f5 g5 h5 \
 # a4 b4 c4 d4 e4 f4 g4 h4 \
-# a3 b3 c3 d3 e3Nf3 g3 h3 \
-# a2Rb2 c2 d2 e2 f2 g2 h2 \
-# a1Rb1 c1 d1 e1kf1 g1 h1  /
+# a3 b3 c3 d3 e3 f3 g3 h3 \
+# a2pb2pc2pd2pe2pf2pg2ph2p\
+# a1rb1nc1id1qe1kf1ig1nh1r /
+# пробел в конце нужен!
+
+    s/^/Board:\
+a8 b8 c8 d8 e8Kf8 g8 h8 \
+a7 b7 c7 d7 e7 f7 g7 h7 \
+a6 b6 c6 d6 e6 f6 g6 h6 \
+a5 b5 c5 d5 e5 f5 g5 h5 \
+a4 b4 c4 d4 e4 f4 g4 h4 \
+a3 b3 c3 d3 e3Nf3 g3 h3 \
+a2Rb2 c2 d2 e2 f2 g2 h2 \
+a1 b1 c1 d1 e1kf1 g1 h1R /
 
     s/\n//g
 
@@ -274,7 +276,7 @@ a1rb1nc1id1qe1kf1ig1nh1r /
 2\
 1\
 \
-Enter command:
+Введите команду
     p
     g
 
@@ -1227,7 +1229,7 @@ Enter command:
     s/\(.*Board:[^ ]*\(..k\).*\)/\1 King:\2__/
     h
 
-    :copy-white-king-moves::loop
+    :check-white-king::loop
     /XX/ ! {
         # убираем всё, кроме короля
         s/.*King:\(.....\).*/\1/
@@ -1272,7 +1274,7 @@ Enter command:
             x
         }
 
-        b copy-white-king-moves::loop
+        b check-white-king::loop
     }
 
     # убираем переводы строк из списка королей
@@ -1284,19 +1286,22 @@ Enter command:
     # 1. если король под ударом (нет XYkHR) — шах или мат
     # 2. и нет ни одного хода без нуля — мат
     /King:.*..kHR/ ! {
-        # шах или мат
-        i\
-        ШАХ ИЛИ МАТ
-
         /King:.*[^0][^0]k[^0X][^0X]/ ! {
             # мат
-
             i\
-            МАТ
+            Ваш шах и мат, вы проиграли
+
+            q
         }
+
+        i\
+        Вам шах
     }
 
-    l;q
+    # вычищаем ходы короля
+    s/ *King:.*//
+
+    b @
 }
 
 /@ *$/ {
