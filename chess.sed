@@ -1,4 +1,5 @@
 #n
+# sed chess by Evgeny Stepanischev (http://bolknote.ru) Aug 2013
 1s/.*/\
     @\
     figures()\
