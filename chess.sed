@@ -5,54 +5,73 @@
     figures()\
     board()\
     label(loop)\
-        input()\
-        move-white()\
-        select-figures(K)\
-        make-fake-kings()\
-        select-figures(p)\
-        label(pawnwhite)\
-            iter-pawn()\
-            break-if-end(pawnwhite)\
-            delete-last-board()\
-            store-only-iter()\
-        back(pawnwhite)\
-        select-figures(q)\
-        label(queenwhite)\
-            iter-queen()\
-            break-if-end(queenwhite)\
-            delete-last-board()\
-            store-only-iter()\
-        back(queenwhite)\
-        select-figures(k)\
-        label(kingwhitw)\
-            iter-king()\
-            break-if-end(kingwhite)\
-            delete-last-board()\
-            store-only-iter()\
-        back(kingwhite)\
-        select-figures(i)\
-        label(bishopwhite)\
-            iter-bishop()\
-            break-if-end(bishopwhite)\
-            delete-last-board()\
-            store-only-iter()\
-        back(bishopwhite)\
-        select-figures(n)\
-        label(knightwhite)\
-            iter-knight()\
-            break-if-end(knightwhite)\
-            delete-last-board()\
-            store-only-iter()\
-        back(knightwhite)\
-        select-figures(r)\
-        label(rookwhite)\
-            iter-rook()\
-            break-if-end(rookwhite)\
-            delete-last-board()\
-            store-only-iter()\
-        back(rookwhite)\
-        check-mate()\
+        label(blackkingmove)\
+            input()\
+            move-white()\
+            select-figures(K)\
+            make-fake-kings()\
+            select-figures(p)\
+            label(pawnwhite)\
+                iter-pawn()\
+                break-if-end(pawnwhite)\
+                delete-last-board()\
+                store-only-iter()\
+            back(pawnwhite)\
+            select-figures(q)\
+            label(queenwhite)\
+                iter-queen()\
+                break-if-end(queenwhite)\
+                delete-last-board()\
+                store-only-iter()\
+            back(queenwhite)\
+            select-figures(k)\
+            label(kingwhitw)\
+                iter-king()\
+                break-if-end(kingwhite)\
+                delete-last-board()\
+                store-only-iter()\
+            back(kingwhite)\
+            select-figures(i)\
+            label(bishopwhite)\
+                iter-bishop()\
+                break-if-end(bishopwhite)\
+                delete-last-board()\
+                store-only-iter()\
+            back(bishopwhite)\
+            select-figures(n)\
+            label(knightwhite)\
+                iter-knight()\
+                break-if-end(knightwhite)\
+                delete-last-board()\
+                store-only-iter()\
+            back(knightwhite)\
+            select-figures(r)\
+            label(rookwhite)\
+                iter-rook()\
+                break-if-end(rookwhite)\
+                delete-last-board()\
+                store-only-iter()\
+            back(rookwhite)\
+            check-mate()\
+            break-if-end(blackkingmove)\
+            move-black()\
+            board()\
+        back(blackkingmove)\
         board()\
+        select-figures(K)\
+        label(king)\
+            iter-king()\
+            break-if-end(king)\
+            set-array()\
+            estimate-white-pieces()\
+            set-array()\
+            estimate-black-pieces()\
+            estimate-black-king()\
+            sum-array()\
+            sub-array()\
+            delete-last-board()\
+            store-iter()\
+        back(king)\
         select-figures(P)\
         label(pawn)\
             iter-pawn()\
@@ -109,20 +128,6 @@
             delete-last-board()\
             store-iter()\
         back(knight)\
-        select-figures(K)\
-        label(king)\
-            iter-king()\
-            break-if-end(king)\
-            set-array()\
-            estimate-white-pieces()\
-            set-array()\
-            estimate-black-pieces()\
-            estimate-black-king()\
-            sum-array()\
-            sub-array()\
-            delete-last-board()\
-            store-iter()\
-        back(king)\
         select-figures(R)\
         label(rook)\
             iter-rook()\
@@ -1411,24 +1416,33 @@ a1 b1 c1 d1 e1kf1 g1 h1  /
              b check-mate::cleanup
         }
 
-         # посмотрим, остался ли ход королю
-         /[^0][^0]K[^X0][^X0]/ ! {
+        # посмотрим, остался ли ход королю
+        /[^0][^0]K[^X0][^X0]/ ! {
             i\
             Мне шах и мат, я проиграл
 
             q
-         }
+        }
 
-         i\
-         Мне шах
+        # вычищаем ходы других фигур
+        s/ *Move:.*//
 
-         x; s/^/(CHECK) /; x
+        # формирует ход короля в первую попавшуюся сторону
+        s/.*\([^0 ][^0 ]K\)[^0 ][^0 ].*\([^ ][^ ]K\)XX.*/(\2→\1)/
+        
+        # кладём его на вершину стека
+        H; x; s/\(.*\)\n\(([^)]*)\)/1B\2 \1/; x
+
+        b check-mate::cleanup
     }
+
+    # кладём метку, что ходов не требуется
+    x; s/^/END /; x
 
     :check-mate::cleanup
     # восстанавливаем стек и убираем с него лишнее
-    g; s/ *King:.*//
 
+    g; s/ *King:.*//
     b @
 }
 
