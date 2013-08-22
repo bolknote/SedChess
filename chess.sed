@@ -7,6 +7,52 @@
     label(loop)\
         input()\
         move-white()\
+        select-figures(K)\
+        make-fake-kings()\
+        select-figures(p)\
+        label(pawnwhite)\
+            iter-pawn()\
+            break-if-end(pawnwhite)\
+            delete-last-board()\
+            store-only-iter()\
+        back(pawnwhite)\
+        select-figures(q)\
+        label(queenwhite)\
+            iter-queen()\
+            break-if-end(queenwhite)\
+            delete-last-board()\
+            store-only-iter()\
+        back(queenwhite)\
+        select-figures(k)\
+        label(kingwhitw)\
+            iter-king()\
+            break-if-end(kingwhite)\
+            delete-last-board()\
+            store-only-iter()\
+        back(kingwhite)\
+        select-figures(i)\
+        label(bishopwhite)\
+            iter-bishop()\
+            break-if-end(bishopwhite)\
+            delete-last-board()\
+            store-only-iter()\
+        back(bishopwhite)\
+        select-figures(n)\
+        label(knightwhite)\
+            iter-knight()\
+            break-if-end(knightwhite)\
+            delete-last-board()\
+            store-only-iter()\
+        back(knightwhite)\
+        select-figures(r)\
+        label(rookwhite)\
+            iter-rook()\
+            break-if-end(rookwhite)\
+            delete-last-board()\
+            store-only-iter()\
+        back(rookwhite)\
+        check-mate()\
+        board()\
         select-figures(P)\
         label(pawn)\
             iter-pawn()\
@@ -89,10 +135,11 @@
             store-iter()\
         back(rook)\
         find-best-move()\
-        board()\
         move-black()\
+        board()\
         check-white-king-exists()\
-        make-fake-white-kings()\
+        select-figures(k)\
+        make-fake-kings()\
         select-figures(P)\
         label(pawnmoves)\
             iter-pawn()\
@@ -135,8 +182,7 @@
             delete-last-board()\
             store-only-iter()\
         back(rookmoves)\
-        board()\
-        check-mate-white()\
+        check-mate()\
     back(loop)\
 /
 
@@ -219,26 +265,26 @@ s/@\([^ ]* \)/\1@/
     # формат: XYFig
     # координаты белых тут и дальше должны идти НИЖЕ чёрных
     # БОЛЬШИЕ — чёрные, маленькие — белые
-    s/^/Board:\
-a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
-a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
-a6 b6 c6 d6 e6 f6 g6 h6 \
-a5 b5 c5 d5 e5 f5 g5 h5 \
-a4 b4 c4 d4 e4 f4 g4 h4 \
-a3 b3 c3 d3 e3 f3 g3 h3 \
-a2pb2pc2pd2pe2pf2pg2ph2p\
-a1rb1nc1id1qe1kf1ig1nh1r /
-# пробел в конце нужен!
-
 #     s/^/Board:\
-# a8 b8 c8 d8 e8Kf8 g8 h8 \
-# a7 b7 c7 d7 e7 f7 g7 h7 \
+# a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
+# a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
 # a6 b6 c6 d6 e6 f6 g6 h6 \
 # a5 b5 c5 d5 e5 f5 g5 h5 \
 # a4 b4 c4 d4 e4 f4 g4 h4 \
 # a3 b3 c3 d3 e3 f3 g3 h3 \
-# a2 b2 c2 d2 e2Pf2 g2 h2 \
-# a1Rb1 c1 d1 e1kf1 g1 h1  /
+# a2pb2pc2pd2pe2pf2pg2ph2p\
+# a1rb1nc1id1qe1kf1ig1nh1r /
+# пробел в конце нужен!
+
+    s/^/Board:\
+a8 b8 c8 d8 e8Kf8 g8 h8r\
+a7 b7 c7 d7 e7 f7 g7 h7 \
+a6 b6 c6 d6 e6nf6 g6 h6 \
+a5 b5 c5 d5 e5 f5 g5 h5 \
+a4 b4 c4 d4 e4 f4 g4 h4 \
+a3 b3 c3 d3 e3 f3 g3 h3 \
+a2 b2 c2 d2 e2 f2 g2 h2 \
+a1 b1 c1 d1 e1kf1 g1 h1  /
 
     s/\n//g
 
@@ -1044,12 +1090,20 @@ a1rb1nc1id1qe1kf1ig1nh1r /
     # выделяем первую пешку
     h; s/\(.....\).*/\1/
 
-    # смотрим, если она на седьмой горизонтали, можно сделать длинный ход, иначе делаем короткий
-    /^\(.\)7\([Pp]\)__/ {
+    # смотрим, если чёрная пешка на седьмой горизонтали, можно сделать длинный ход, иначе делаем короткий
+    /^\(.\)7P__/ {
         # собственно, сам ход
-        s//\15\2DT/
+        s//\15PDT/
         b iter-pawn::checkpiece
     }
+
+    # смотрим, если белая пешка на второй горизонтали, можно сделать длинный ход, иначе делаем короткий
+    /^\(.\)2p__/ {
+        # собственно, сам ход
+        s//\14pDT/
+        b iter-pawn::checkpiece
+    }
+
     # иначе, двигаемся по направлениям
     s/$/ __DODLDRXXDTDO/
     s/\(..\) \(.*\1\)\(..\)/\3 \2\3/; s/ .*//
@@ -1086,6 +1140,7 @@ a1rb1nc1id1qe1kf1ig1nh1r /
             s/^../00/
         }
     }
+
     # убираем за собой доску
     s/ *Board:.*//
 
@@ -1263,13 +1318,13 @@ a1rb1nc1id1qe1kf1ig1nh1r /
 }
 
 # создаём вторую доску и фейковых королей на ней, в тех позициях, куда бы король мог сходить
-/@make-fake-white-kings()/ {
+/@make-fake-kings()/ {
     # копируем короля с координатой в конец
-    s/\(.*Board:[^ ]*\(..k\).*\)/\1 King:\2__/
+    s/\(...\)[^ ]* *\(.*\)/\2 King:\1__/
 
     h
 
-    :make-fake-white-kings::loop
+    :make-fake-kings::loop
     /XX/ ! {
         # убираем всё, кроме короля
         s/.*King:\(.....\).*/\1/
@@ -1292,27 +1347,28 @@ a1rb1nc1id1qe1kf1ig1nh1r /
         H; g
 
         # переписываем выбранную позицию в позицию самой первой фигуры (фигуры где король стоит сейчас)
-        s/\(King:...\)..\(.*..k\(..\)\)$/\1\3\2/
+        s/\(King:...\)..\(.*..[kK]\(..\)\)$/\1\3\2/
 
         # на второй доске в указанной позиции (если там не стоит своя же фигура, нужно поставить
         # псевдо-короля (z)
-        /.*\([^0][^0]\)k..$/ {
+        /.*\([^0][^0][kK]\)..$/ {
             x
             s//\1 &/
 
-            /^\(..\) \(Board:[^ ]*\)\1[^pqinrk]/ {
-                # ставим в конец доски псевдокороля, чтобы не нарушать принцип,
-                # по которому белые всегда идут после чёрных
-                s/^\(..\) Board:[^ ]*/&\1z/
-            }
+            # ставим в конец доски белого псевдокороля…
+            /^\(..\)k \(Board:[^ ]*\)\1[^pqinrk]/ s/^\(..\) Board:[^ ]*/&\1z/
+            # чёрного псеводокороля
+            /^\(..\)K \(Board:[^ ]*\)\1[^PQKINR]/ s/^\(..\) Board:[^ ]*/&\1z/
+            # (на месте, куда мы якобы помещаем псевдокороля не должно стоять своей же фигуры)
+            # если её там не было, то теперь две ячейки имеют одну и ту же координату
 
             # убираем координаты короля вверху стека, которые мы поставили для проверок
-            s/^.. //
+            s/^... //
 
             x
         }
 
-        b make-fake-white-kings::loop
+        b make-fake-kings::loop
     }
 
     # заменяем переводы строк на пробелы в стеке короля
@@ -1321,37 +1377,55 @@ a1rb1nc1id1qe1kf1ig1nh1r /
     b @
 }
 
-# проверка мата и шаха белому королю
-/@check-mate-white()/ {
+# проверка мата и шаха королю
+/@check-mate()/ {
     # во-первых, вычищаем псевдокоролей с доски
     s/\(Board:[^ z]*\)..z[^ ]*/\1/
 
     # во-вторых, сохраняем стек и оставляем только ходы и возможные расположения королей
-    h; s/.*King:/King:/
+    h; s/.*King:\(..\(.\)\)/\2ing:\1/
 
     # есть ли угроза королю?
-    /King:\(..\).*Move:\1/ {
+    /[Kk]ing:\(..\).*Move:\1/ {
          # это уже шах, теперь надо перебрать все позиции и посмотреть есть ли куда королю деваться,
          # если нет, это мат
 
-         :check-mate-white::loop
-         /\(..\)k.. *\(.*\)Move:\1./ {
+         :check-mate::loop
+         /\(..\)[kK].. *\(.*\)Move:\1./ {
             s//\2/
 
-            b check-mate-white::loop
+            b check-mate::loop
          }
 
+         /^k/ {
+             # посмотрим, остался ли ход королю
+             /[^0][^0]k[^X0][^X0]/ ! {
+                i\
+                Вам шах и мат, вы проиграли
+
+                q
+             }
+             i\
+             Вам шах
+
+             b check-mate::cleanup
+        }
+
          # посмотрим, остался ли ход королю
-         /[^0][^0]k[^X0][^X0]/ ! {
+         /[^0][^0]K[^X0][^X0]/ ! {
             i\
-            Вам шах и мат, вы проиграли
+            Мне шах и мат, я проиграл
 
             q
          }
+
          i\
-         Вам шах
+         Мне шах
+
+         x; s/^/(CHECK) /; x
     }
 
+    :check-mate::cleanup
     # восстанавливаем стек и убираем с него лишнее
     g; s/ *King:.*//
 
