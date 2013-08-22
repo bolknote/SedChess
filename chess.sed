@@ -8,6 +8,7 @@
         label(blackkingmove)\
             input()\
             move-white()\
+            check-black-king-exists()\
             select-figures(K)\
             make-fake-kings()\
             select-figures(p)\
@@ -55,6 +56,7 @@
             check-mate()\
             break-if-end(blackkingmove)\
             move-black()\
+            check-white-king-exists()\
             board()\
         back(blackkingmove)\
         board()\
@@ -270,26 +272,26 @@ s/@\([^ ]* \)/\1@/
     # формат: XYFig
     # координаты белых тут и дальше должны идти НИЖЕ чёрных
     # БОЛЬШИЕ — чёрные, маленькие — белые
-#     s/^/Board:\
-# a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
-# a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
-# a6 b6 c6 d6 e6 f6 g6 h6 \
-# a5 b5 c5 d5 e5 f5 g5 h5 \
-# a4 b4 c4 d4 e4 f4 g4 h4 \
-# a3 b3 c3 d3 e3 f3 g3 h3 \
-# a2pb2pc2pd2pe2pf2pg2ph2p\
-# a1rb1nc1id1qe1kf1ig1nh1r /
-# пробел в конце нужен!
-
     s/^/Board:\
-a8 b8 c8 d8 e8Kf8 g8 h8r\
-a7 b7 c7 d7 e7 f7 g7 h7 \
-a6 b6 c6 d6 e6nf6 g6 h6 \
+a8Rb8Nc8Id8Qe8Kf8Ig8Nh8R\
+a7Pb7Pc7Pd7Pe7Pf7Pg7Ph7P\
+a6 b6 c6 d6 e6 f6 g6 h6 \
 a5 b5 c5 d5 e5 f5 g5 h5 \
 a4 b4 c4 d4 e4 f4 g4 h4 \
 a3 b3 c3 d3 e3 f3 g3 h3 \
-a2 b2 c2 d2 e2 f2 g2 h2 \
-a1 b1 c1 d1 e1kf1 g1 h1  /
+a2pb2pc2pd2pe2pf2pg2ph2p\
+a1rb1nc1id1qe1kf1ig1nh1r /
+# пробел в конце нужен!
+
+#     s/^/Board:\
+# a8 b8 c8 d8 e8Kf8 g8 h8r\
+# a7 b7 c7 d7 e7 f7 g7 h7 \
+# a6 b6 c6 d6 e6nf6 g6 h6 \
+# a5 b5 c5 d5 e5 f5 g5 h5 \
+# a4 b4 c4 d4 e4 f4 g4 h4 \
+# a3 b3 c3 d3 e3 f3 g3 h3 \
+# a2 b2 c2 d2 e2 f2 g2 h2k\
+# a1 b1 c1 d1 e1 f1 g1 h1  /
 
     s/\n//g
 
@@ -1451,6 +1453,18 @@ a1 b1 c1 d1 e1kf1 g1 h1  /
     /Board:[^ ]*k/ ! {
         i\
         Вам шах и мат, вы проиграли
+
+        q  
+    }
+
+    b @
+}
+
+# возможно на ходе белых чёрного короля съели?
+/@check-black-king-exists()/ {
+    /Board:[^ ]*K/ ! {
+        i\
+        Мне шах и мат, я проиграл
 
         q  
     }
