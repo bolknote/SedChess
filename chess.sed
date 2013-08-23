@@ -1039,13 +1039,13 @@ a1rb1nc1id1qe1kf1ig1nh1r /
         s///
 
         # X-1
-        /[\-\^]/ y/abcdefgh/0abcdefg/
+        /[-^]/ y/abcdefgh/0abcdefg/
         # X+1
         /[+v]/ y/abcdefgh/bcdefgh0/
         # Y-1
         /[-v]/ y/12345678/01234567/
         # Y+1
-        /[+\^]/ y/12345678/23456780/
+        /[+^]/ y/12345678/23456780/
 
         b iter-bishop::minus
     }
