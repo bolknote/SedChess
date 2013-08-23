@@ -1,4 +1,6 @@
-## Шахматы, написанные на языке утилиты sed
+## Шахматы, написанные на языке утилиты sed / Chess implemented in sed utility
+
+English guide is below
 
 ### Запуск
 sed -f chess.sed
@@ -19,5 +21,26 @@ sed -f chess.sed
 3. обнаружение пата
 4. контроль за правильностью хода человека
 
+## English
+
+### Launch
+sed -f chess.sed
+
+### How to play
+Press `Enter` to start. Press `q` and `Enter` to quit.
+
+To make a turn write it down separated by a space, then press `Enter`. For example: `e2 e4`. You play white side.
+
+### Implemented
+1. Position evaluation for one turn and pieces evaluation.
+2. Detection of check and checkmate.
+3. A pawn that reaches the opposite side promotes to a queen.
+
+### Not implemented
+1. Castling (introduced in 14-15th century rules)
+2. En passant (introduced in 15th century rules)
+3. Detection of stalemate
+4. Controlling correctness of human moves
+
 -- 
-Евгений Степанищев
+Евгений Степанищев / Evgeny Stepanischev
