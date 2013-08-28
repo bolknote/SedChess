@@ -42,5 +42,13 @@ To make a turn write it down separated by a space, then press `Enter`. For examp
 3. Detection of stalemate
 4. Controlling correctness of human moves
 
+### Troubleshooting
+
+- sed: file chess.sed line 312: strings for `y' command are different lengths
+
+  [Make sure you are using a UTF locale
+  (e.g. en_US.UTF-8)](https://github.com/bolknote/SedChess/issues/9)
+
+
 -- 
 Евгений Степанищев / Evgeny Stepanischev
