@@ -21,6 +21,11 @@ sed -f chess.sed
 3. обнаружение пата
 4. контроль за правильностью хода человека
 
+### Решения проблем
+- sed: file chess.sed line 312: strings for `y' command are different lengths
+
+Убедитесь, что ваша консоль использует локаль UTF-8 (например, ru_RU.UTF-8)
+
 ## English
 
 ### Launch
